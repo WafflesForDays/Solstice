@@ -238,6 +238,15 @@
     transform: translateY(-3px);
     box-shadow: 0 10px 30px rgba(168,220,255,0.18);
   }
+  .frame img,
+  .hero-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+    display: block;
+  }
+
 
   /* Top img */
   .thumb.featured .frame {
@@ -319,6 +328,8 @@
       <!-- Top image -->
       <button class="thumb featured" data-page="p5">
         <span class="frame">PLACEHOLDER IMAGE</span>
+          <img src="images/test.jpg" alt="Solstice">
+        </span>
         <span class="caption">PLACEHOLDER</span>
       </button>
 
