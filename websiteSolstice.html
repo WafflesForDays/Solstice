@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solstice</title>
+<style>
+  :root {
+    /* --- ADJUSTABLE TIMER (seconds) --- */
+    --fade-duration: 12s;
+    /* Swirl animation speed */
+    --swirl-speed: 99999s; /* Disabled; it looked kinda bad */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: #000;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    color: #fff;
+    overflow: hidden;
+  }
+
+  #bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  #bg::before {
+    content: "";
+    position: absolute;
+    inset: -25%;
+    /* Cool gradient */
+    background:
+      radial-gradient(circle at 30% 35%, var(--swirl-a) 0%, transparent 45%),
+      radial-gradient(circle at 70% 65%, var(--swirl-b) 0%, transparent 45%),
+      conic-gradient(from 0deg at 50% 50%,
+        var(--swirl-a) 0deg,
+        var(--swirl-b) 90deg,
+        var(--swirl-a) 180deg,
+        var(--swirl-b) 270deg,
+        var(--swirl-a) 360deg);
+    filter: blur(70px) saturate(140%);
+    opacity: 0.85;
+    animation:
+      swirlSpin var(--swirl-speed) linear infinite,
+      goldBlue var(--fade-duration) ease-in-out infinite;
+    will-change: transform, filter;
+  }
+
+  /* Layering */
+  #bg::after {
+    content: "";
+    position: absolute;
+    inset: -25%;
+    background:
+      radial-gradient(circle at 65% 30%, var(--swirl-b) 0%, transparent 40%),
+      radial-gradient(circle at 25% 75%, var(--swirl-a) 0%, transparent 40%);
+    filter: blur(90px);
+    opacity: 0.6;
+    animation:
+      swirlSpinReverse calc(var(--swirl-speed) * 1.6) linear infinite,
+      goldBlue calc(var(--fade-duration) * 1.35) ease-in-out infinite reverse;
+    will-change: transform;
+  }
+
+  @keyframes swirlSpin {
+    from { transform: rotate(0deg) scale(1.05); }
+    to   { transform: rotate(360deg) scale(1.05); }
+  }
+  @keyframes swirlSpinReverse {
+    from { transform: rotate(360deg) scale(1.15); }
+    to   { transform: rotate(0deg) scale(1.15); }
+  }
+
+  /* Colors to cycle */
+  @keyframes goldBlue {
+    0%   { --swirl-a: #d4af37; --swirl-b: #a8dcff; }
+    50%  { --swirl-a: #a8dcff; --swirl-b: #d4af37; }
+    100% { --swirl-a: #d4af37; --swirl-b: #a8dcff; }
+  }
+
+  /* Temp bug fix cuz Im lazy */
+  @keyframes goldBlueFallback {
+    0%, 100% { filter: blur(70px) hue-rotate(0deg) saturate(160%); }
+    50%      { filter: blur(70px) hue-rotate(150deg) saturate(160%); }
+  }
+
+  /* ==========
+     A0-A3 tabs
+     ========== */
+  nav#tabs {
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 20;
+    display: flex;
+    gap: 6px;
+    padding: 14px 16px;
+  }
+
+  nav#tabs button {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.22);
+    color: #fff;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition: background 0.25s, border-color 0.25s, transform 0.15s;
+  }
+  nav#tabs button:hover { background: rgba(255,255,255,0.14); transform: translateY(-1px); }
+  nav#tabs button.active {
+    background: rgba(212,175,55,0.28);
+    border-color: rgba(212,175,55,0.85);
+  }
+
+  /* ============================================================
+     PAGES
+     ============================================================ */
+  main {
+    position: relative;
+    z-index: 10;
+    height: 100%;
+    width: 100%;
+  }
+
+  .page {
+    position: absolute;
+    inset: 0;
+    display: none;
+    overflow-y: auto;
+    padding: 88px 24px 40px;
+  }
+  .page.active { display: flex; flex-direction: column; align-items: center; }
+
+  .page h1 {
+    font-size: clamp(1.6rem, 4vw, 3rem);
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    margin-bottom: 28px;
+    text-transform: uppercase;
+    text-align: center;
+    text-shadow: 0 0 24px rgba(168,220,255,0.35);
+  }
+
+  /* Top-center image on every page */
+  .hero-img {
+    width: min(620px, 86vw);
+    aspect-ratio: 16 / 9;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.55);
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    backdrop-filter: blur(4px);
+    flex: 0 0 auto;
+  }
+
+  .body-text {
+    max-width: 620px;
+    margin-top: 26px;
+    text-align: center;
+    font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+    line-height: 1.85;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 0.04em;
+  }
+
+  /* Text-only tab pages */
+  .page.text-only {
+    justify-content: center;
+  }
+  .page.text-only .body-text { margin-top: 0; }
+
+  /* Return to overview */
+  .back-btn {
+    margin-top: 6px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.22);
+    color: #fff;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    padding: 7px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+  }
+  .back-btn:hover { background: rgba(255,255,255,0.14); }
+
+  /* A0 */
+  .gallery {
+    width: min(820px, 92vw);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+    margin-top: 4px;
+  }
+
+  .thumb {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: none;
+    color: inherit;
+    padding: 0;
+    font: inherit;
+  }
+
+  .thumb .frame {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.55);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    backdrop-filter: blur(4px);
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+  }
+  .thumb:hover .frame {
+    border-color: rgba(212,175,55,0.85);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(168,220,255,0.18);
+  }
+
+  /* Top img */
+  .thumb.featured .frame {
+    width: min(420px, 86vw);
+    aspect-ratio: 4 / 3;
+  }
+  .thumb.featured .caption { font-size: 14px; }
+
+  /* 2x2 grid */
+  .grid-2x2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+    width: 100%;
+  }
+  .grid-2x2 .frame {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+  }
+
+  .caption {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.82);
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  /* Fade timer */
+  .timer-box {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 30;
+    background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 10px;
+    padding: 10px 14px;
+    backdrop-filter: blur(8px);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.8);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .timer-box input[type="range"] {
+    width: 120px;
+    accent-color: #d4af37;
+  }
+
+  @media (max-width: 560px) {
+    nav#tabs button { font-size: 11px; padding: 7px 10px; }
+    .page { padding: 96px 14px 30px; }
+    .grid-2x2 { gap: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ SHARED, PERSISTENT BACKGROUND ============ -->
+<div id="bg" aria-hidden="true"></div>
+
+<!-- ============ TABS ============ -->
+<nav id="tabs">
+  <button data-page="p1" class="active">MEMBERS</button>
+  <button data-page="p2">A1</button>
+  <button data-page="p3">A2</button>
+  <button data-page="p4">A3</button>
+</nav>
+
+<main>
+
+  <!-- ---------- PAGE 1: title + featured image + texts + 2x2 grid ---------- -->
+  <section class="page active" id="p1">
+    <h1>SOLSTICE</h1>
+
+    <div class="gallery">
+      <!-- Top image -->
+      <button class="thumb featured" data-page="p5">
+        <span class="frame">PLACEHOLDER IMAGE</span>
+        <span class="caption">PLACEHOLDER</span>
+      </button>
+
+      <!-- four images in a 2x2 square beneath -->
+      <div class="grid-2x2">
+        <button class="thumb" data-page="p6">
+          <span class="frame">PLACEHOLDER IMAGE</span>
+          <span class="caption">PLACEHOLDER</span>
+        </button>
+        <button class="thumb" data-page="p7">
+          <span class="frame">PLACEHOLDER IMAGE</span>
+          <span class="caption">PLACEHOLDER</span>
+        </button>
+        <button class="thumb" data-page="p8">
+          <span class="frame">PLACEHOLDER IMAGE</span>
+          <span class="caption">PLACEHOLDER</span>
+        </button>
+        <button class="thumb" data-page="p9">
+          <span class="frame">PLACEHOLDER IMAGE</span>
+          <span class="caption">PLACEHOLDER</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- A1-A3 ---------- -->
+  <section class="page text-only" id="p2">
+    <div class="body-text">
+      A1 not available.
+    </div>
+  </section>
+
+  <section class="page text-only" id="p3">
+    <div class="body-text">
+      A2 not available.
+    </div>
+  </section>
+
+  <section class="page text-only" id="p4">
+    <div class="body-text">
+      A3 not available.
+    </div>
+  </section>
+
+  <!-- ---------- Bios ---------- -->
+  <section class="page" id="p5">
+    <button class="back-btn" data-page="p1">← BACK</button>
+    <div class="hero-img" style="margin-top:22px;">PLACEHOLDER IMAGE</div>
+    <div class="body-text">PLACEHOLDER TEXT.</div>
+  </section>
+
+  <section class="page" id="p6">
+    <button class="back-btn" data-page="p1">← BACK</button>
+    <div class="hero-img" style="margin-top:22px;">PLACEHOLDER IMAGE</div>
+    <div class="body-text">PLACEHOLDER TEXT.</div>
+  </section>
+
+  <section class="page" id="p7">
+    <button class="back-btn" data-page="p1">← BACK</button>
+    <div class="hero-img" style="margin-top:22px;">PLACEHOLDER IMAGE</div>
+    <div class="body-text">PLACEHOLDER TEXT.</div>
+  </section>
+
+  <section class="page" id="p8">
+    <button class="back-btn" data-page="p1">← BACK</button>
+    <div class="hero-img" style="margin-top:22px;">PLACEHOLDER IMAGE</div>
+    <div class="body-text">PLACEHOLDER TEXT.</div>
+  </section>
+
+  <section class="page" id="p9">
+    <button class="back-btn" data-page="p1">← BACK</button>
+    <div class="hero-img" style="margin-top:22px;">PLACEHOLDER IMAGE</div>
+    <div class="body-text">PLACEHOLDER TEXT.</div>
+  </section>
+
+</main>
+
+<!-- ============ TIMER CONTROL ============ 
+<div class="timer-box">
+  <label for="fade">FADE TIMER</label>
+  <input id="fade" type="range" min="2" max="60" step="1" value="12">
+  <span id="fadeVal">12s</span>
+</div> -->
+
+<script>
+  /* ---------- Install CSS custom property support ---------- */
+  if (window.CSS && CSS.registerProperty) {
+    try {
+      CSS.registerProperty({
+        name: '--swirl-a', syntax: '<color>', inherits: true, initialValue: '#d4af37'
+      });
+      CSS.registerProperty({
+        name: '--swirl-b', syntax: '<color>', inherits: true, initialValue: '#a8dcff'
+      });
+    } catch (e) { /* already registered */ }
+  } else {
+    /* Temp bug fix */
+    document.getElementById('bg').style.animation = 'none';
+    const st = document.createElement('style');
+    st.textContent = `
+      #bg::before { animation: swirlSpin var(--swirl-speed) linear infinite,
+                                 goldBlueFallback var(--fade-duration) ease-in-out infinite !important; }
+      #bg::after  { animation: swirlSpinReverse calc(var(--swirl-speed)*1.6) linear infinite,
+                                 goldBlueFallback calc(var(--fade-duration)*1.35) ease-in-out infinite reverse !important; }
+    `;
+    document.head.appendChild(st);
+  }
+
+  /* ---------- Page swapping ---------- */
+  const pages = document.querySelectorAll('.page');
+  const tabs  = document.querySelectorAll('nav#tabs button');
+
+  function show(id) {
+    pages.forEach(p => p.classList.toggle('active', p.id === id));
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.page === id));
+    document.querySelector('.page.active').scrollTop = 0;
+  }
+
+  document.querySelectorAll('[data-page]').forEach(el => {
+    el.addEventListener('click', () => show(el.dataset.page));
+  });
+
+  /* ---------- Fade timer slider ---------- 
+  const slider = document.getElementById('fade');
+  const label  = document.getElementById('fadeVal');
+  slider.addEventListener('input', () => {
+    const secs = slider.value;
+    label.textContent = secs + 's';
+    document.documentElement.style.setProperty('--fade-duration', secs + 's');
+    // Keep the second layer's phase offset intact
+    document.documentElement.style.setProperty('--fade-duration-2', (secs * 1.35) + 's');
+  });*/
+
+  if (location.hash && document.querySelector(location.hash)) {
+    show(location.hash.slice(1));
+  }
+</script>
+</body>
+</html>
+
+/* If this breaks I might cry */
