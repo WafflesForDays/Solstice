@@ -17,7 +17,7 @@
   html, body {
     height: 100%;
     background: #000;
-    font-family: 'Brush Script Std', cursive;
+    font-family: 'Trattatello', fantasy;
     color: #fff;
     overflow: hidden;
   }
@@ -247,7 +247,11 @@
     display: block;
   }
 
-
+  /* Title */
+  .title .frame {
+    width: min(400px, 86vw);
+    aspect-ratio: 16 / 1;
+  }
   /* Top img */
   .thumb.featured .frame {
     width: min(420px, 86vw);
@@ -322,9 +326,13 @@
 
   <!-- ---------- PAGE 1: title + featured image + texts + 2x2 grid ---------- -->
   <section class="page active" id="p1">
-    <h1>SOLSTICE</h1>
 
     <div class="gallery">
+      <div class="title" data-page="p5">
+        <span class="frame">
+          <img src="images/title.png" alt="SOLSTICE">
+        </span>
+      </div>
       <!-- Top image -->
       <button class="thumb featured" data-page="p5">
         <span class="frame">PLACEHOLDER IMAGE</span>
