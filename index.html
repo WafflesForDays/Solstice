@@ -252,21 +252,15 @@
     width: min(400px, 86vw);
     aspect-ratio: 16 / 1;
   }
-  /* Top img */
-  .thumb.featured .frame {
-    width: min(420px, 86vw);
-    aspect-ratio: 4 / 3;
-  }
-  .thumb.featured .caption { font-size: 14px; }
 
-  /* 2x2 grid */
-  .grid-2x2 {
+  /* 3x2 grid */
+  .grid-3x2 {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 22px;
     width: 100%;
   }
-  .grid-2x2 .frame {
+  .grid-3x2 .frame {
     width: 100%;
     aspect-ratio: 4 / 3;
   }
@@ -305,7 +299,7 @@
   @media (max-width: 560px) {
     nav#tabs button { font-size: 11px; padding: 7px 10px; }
     .page { padding: 96px 14px 30px; }
-    .grid-2x2 { gap: 14px; }
+    .grid-3x2 { gap: 14px; }
   }
 </style>
 </head>
@@ -324,23 +318,22 @@
 
 <main>
 
-  <!-- ---------- PAGE 1: title + featured image + texts + 2x2 grid ---------- -->
+  <!-- ---------- PAGE 1: title + 3x2 image grid ---------- -->
   <section class="page active" id="p1">
 
     <div class="gallery">
-      <div class="title"">
+      <div class="title">
         <span class="frame">
           <img src="images/title.png" alt="SOLSTICE">
         </span>
       </div>
-      <!-- Top image -->
-      <button class="thumb featured" data-page="p5">
-        <span class="frame">PLACEHOLDER IMAGE</span>
-        <span class="caption">PLACEHOLDER</span>
-      </button>
 
-      <!-- four images in a 2x2 square beneath -->
-      <div class="grid-2x2">
+      <!-- six images in a 3x2 grid -->
+      <div class="grid-3x2">
+        <button class="thumb" data-page="p5">
+          <span class="frame">PLACEHOLDER IMAGE</span>
+          <span class="caption">PLACEHOLDER</span>
+        </button>
         <button class="thumb" data-page="p6">
           <span class="frame">PLACEHOLDER IMAGE</span>
           <span class="caption">PLACEHOLDER</span>
@@ -354,6 +347,10 @@
           <span class="caption">PLACEHOLDER</span>
         </button>
         <button class="thumb" data-page="p9">
+          <span class="frame">PLACEHOLDER IMAGE</span>
+          <span class="caption">PLACEHOLDER</span>
+        </button>
+        <button class="thumb" data-page="p10">
           <span class="frame">PLACEHOLDER IMAGE</span>
           <span class="caption">PLACEHOLDER</span>
         </button>
@@ -406,6 +403,12 @@
   </section>
 
   <section class="page" id="p9">
+    <button class="back-btn" data-page="p1">← BACK</button>
+    <div class="hero-img" style="margin-top:22px;">PLACEHOLDER IMAGE</div>
+    <div class="body-text">PLACEHOLDER TEXT.</div>
+  </section>
+
+  <section class="page" id="p10">
     <button class="back-btn" data-page="p1">← BACK</button>
     <div class="hero-img" style="margin-top:22px;">PLACEHOLDER IMAGE</div>
     <div class="body-text">PLACEHOLDER TEXT.</div>
@@ -475,5 +478,3 @@
 </script>
 </body>
 </html>
-
-/* If this breaks I might cry */
